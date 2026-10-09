@@ -170,3 +170,5 @@ ADC1.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_0
 ADC1.Rank-0\#ChannelRegularConversion=1
 ADC1.SamplingTime-0\#ChannelRegularConversion=ADC_SAMPLINGTIME_COMMON_1
 ADC1.IPParameters=ClockPrescaler,Resolution,SamplingTimeCommon1,NbrOfConversion,Channel-0\#ChannelRegularConversion,Rank-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion
+
+NVIC.USART2_IRQn=true\:1\:0\:false\:false\:true\:true\:true\:true

@@ -36,6 +36,9 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+Board/runtime.c \
+Sensors/mpu6050.c \
+Trainer/timing.c \
 Core/Src/main.c \
 Core/Src/stm32c0xx_it.c \
 Core/Src/stm32c0xx_hal_msp.c \
@@ -116,6 +119,7 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
+-IBoard -ISensors -ITrainer \
 -ICore/Inc \
 -IDrivers/STM32C0xx_HAL_Driver/Inc \
 -IDrivers/STM32C0xx_HAL_Driver/Inc/Legacy \
