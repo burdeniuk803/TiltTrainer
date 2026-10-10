@@ -2,6 +2,7 @@
 #include "main.h"
 #include "mpu6050.h"
 #include "timing.h"
+#include "trainer.h"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -28,6 +29,7 @@ static uint16_t adc;
 static bool adc_ok;
 static tt_io_result imu_status;
 static tt_sample sample;
+static tt_trainer trainer;
 /* Bounded UART queue; hardware interrupts send without delaying the scheduler. */
 static uint8_t tx[2048], transmitting;
 static unsigned tx_head, tx_tail;
@@ -56,9 +58,11 @@ static void read_adc(void)
   if (adc_ok) adc=(uint16_t)HAL_ADC_GetValue(&hadc1);
   HAL_ADC_Stop(&hadc1);
   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,GPIO_PIN_RESET);
+  tt_trainer_adc(&trainer,adc_ok,adc);
 }
 void tt_board_start(void)
 {
+  tt_trainer_init(&trainer);
   HAL_Delay(100); /* Only power-on settling; never in the measurement loop. */
   HAL_NVIC_SetPriority(USART2_IRQn,1,0);
   HAL_NVIC_EnableIRQ(USART2_IRQn);
@@ -77,14 +81,21 @@ void tt_board_start(void)
 void tt_board_poll(void)
 {
   uint32_t now=HAL_GetTick(); uart_service();
+  tt_trainer_tick(&trainer,now);
   if (tt_button_update(&button,HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_0)==GPIO_PIN_RESET,now))
-    log_line("EVENT t_ms=%lu event=BASE_PRESS\r\n",(unsigned long)now);
+    tt_request_base(&trainer,now);
   if (tt_due(&mpu_clock,now)) {
     HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,GPIO_PIN_SET);
     imu_status=tt_imu_read(&imu,&sample);
     HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,GPIO_PIN_RESET);
+    tt_trainer_sample(&trainer,&sample,imu_status,HAL_GetTick());
   }
   if (tt_due(&adc_clock,now)) read_adc();
+  if (trainer.event!=TT_NO_EVENT) {
+    log_line("EVENT t_ms=%lu event=%s mode=%s samples=%u reason=%s\r\n",
+      (unsigned long)now,tt_event_name(trainer.event),tt_mode_name(trainer.mode),trainer.cal_count,trainer.reason);
+    trainer.event=TT_NO_EVENT;
+  }
   if (tt_due(&uart_clock,now))
     log_line("DATA t_ms=%lu mode=WAIT_BASE valid=0 angle_deg=NA limit_deg=NA state=NA adc=%u imu=%s\r\n",(unsigned long)now,adc,tt_io_name(imu_status));
   if (__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)) {

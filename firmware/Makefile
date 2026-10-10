@@ -39,6 +39,7 @@ C_SOURCES =  \
 Board/runtime.c \
 Sensors/mpu6050.c \
 Trainer/timing.c \
+Trainer/trainer.c \
 Core/Src/main.c \
 Core/Src/stm32c0xx_it.c \
 Core/Src/stm32c0xx_hal_msp.c \
