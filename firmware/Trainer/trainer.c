@@ -12,6 +12,32 @@ bool tt_sample_stable(const tt_sample *sample)
   float length=norm(sample->acceleration);
   return length >= 0.95f && length <= 1.05f && norm(sample->angular_rate) <= 5.0f;
 }
+bool tt_vector_angle(const float base[3], const float vector[3], float *angle)
+{
+  float a=norm(base), b=norm(vector);
+  if (!isfinite(a) || !isfinite(b) || a < 0.001f || b < 0.001f) return false;
+  float dot=0;
+  for (unsigned axis=0;axis<3;++axis) dot+=(base[axis]/a)*(vector[axis]/b);
+  if (!isfinite(dot)) return false;
+  if (dot > 1.0f) dot=1.0f;
+  if (dot < -1.0f) dot=-1.0f;
+  *angle=acosf(dot)*57.2957795131f;
+  return isfinite(*angle);
+}
+static void clear_window(tt_trainer *t)
+{
+  t->window_count=0; t->window_index=0; t->valid=false;
+}
+static void estimate(tt_trainer *t, const tt_sample *sample)
+{
+  memcpy(t->window[t->window_index],sample->acceleration,sizeof sample->acceleration);
+  t->window_index=(t->window_index+1U)%5U;
+  if (t->window_count < 5U) ++t->window_count;
+  if (t->window_count != 5U) { t->valid=false; return; }
+  float mean[3]={0};
+  for (unsigned i=0;i<5;++i) for (unsigned axis=0;axis<3;++axis) mean[axis]+=t->window[i][axis]/5.0f;
+  t->valid=t->adc_valid && tt_vector_angle(t->base,mean,&t->angle);
+}
 void tt_trainer_init(tt_trainer *t)
 {
   memset(t,0,sizeof *t); t->mode=TT_WAIT_BASE; t->reason="NO_BASE";
@@ -19,6 +45,7 @@ void tt_trainer_init(tt_trainer *t)
 void tt_request_base(tt_trainer *t, uint32_t now)
 {
   if (t->mode==TT_CALIBRATING || t->mode==TT_SENSOR_ERROR) return;
+  clear_window(t);
   t->mode=TT_CALIBRATING; t->valid=false; t->cal_count=0; t->cal_started=now;
   memset(t->cal_mean,0,sizeof t->cal_mean); memset(t->cal_m2,0,sizeof t->cal_m2);
   t->event=TT_CAL_START; t->reason="COLLECTING";
@@ -43,6 +70,10 @@ void tt_trainer_sample(tt_trainer *t, const tt_sample *sample, tt_io_result stat
 {
   t->last_sample=now;
   bool stable=status==TT_IO_OK && tt_sample_stable(sample);
+  if (t->mode==TT_TRAINING) {
+    if (stable) estimate(t,sample); else clear_window(t);
+    return;
+  }
   if (t->mode!=TT_CALIBRATING) return;
   if (now==t->cal_started) return; /* A sample from the request tick is not new. */
   if (!stable) { reject(t,status==TT_IO_OK?"MOTION":"READ_ERROR",false); return; }
@@ -58,6 +89,7 @@ void tt_trainer_sample(tt_trainer *t, const tt_sample *sample, tt_io_result stat
   float length=norm(t->cal_mean);
   if (!isfinite(length) || length < 0.001f) { reject(t,"INVALID_MEAN",true); return; }
   for (unsigned axis=0;axis<3;++axis) t->base[axis]=t->cal_mean[axis]/length;
+  clear_window(t);
   t->base_valid=true; t->mode=TT_TRAINING; t->event=TT_CAL_OK; t->reason="OK";
 }
 const char *tt_mode_name(tt_mode mode)

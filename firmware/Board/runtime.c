@@ -96,8 +96,13 @@ void tt_board_poll(void)
       (unsigned long)now,tt_event_name(trainer.event),tt_mode_name(trainer.mode),trainer.cal_count,trainer.reason);
     trainer.event=TT_NO_EVENT;
   }
-  if (tt_due(&uart_clock,now))
-    log_line("DATA t_ms=%lu mode=WAIT_BASE valid=0 angle_deg=NA limit_deg=NA state=NA adc=%u imu=%s\r\n",(unsigned long)now,adc,tt_io_name(imu_status));
+  if (tt_due(&uart_clock,now)) {
+    char angle[16]="NA", limit[16]="NA";
+    if (trainer.valid) { unsigned value=(unsigned)(trainer.angle*10.0f+0.5f); snprintf(angle,sizeof angle,"%u.%u",value/10U,value%10U); }
+    if (trainer.adc_valid) { unsigned value=(unsigned)(trainer.limit*10.0f+0.5f); snprintf(limit,sizeof limit,"%u.%u",value/10U,value%10U); }
+    log_line("DATA t_ms=%lu mode=%s valid=%u angle_deg=%s limit_deg=%s state=%s adc=%u\r\n",
+      (unsigned long)now,tt_mode_name(trainer.mode),(unsigned)trainer.valid,angle,limit,trainer.valid?"WITHIN":"NA",adc);
+  }
   if (__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)) {
     uint8_t command;
     if (HAL_UART_Receive(&huart2,&command,1,1)!=HAL_OK) return;
