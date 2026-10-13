@@ -1,0 +1,52 @@
+docker build -t stm32c0-wokwi-build:local docker
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 476B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/3] FROM docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401
+#4 resolve docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401
+#4 resolve docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401 0.1s done
+#4 DONE 0.1s
+
+#5 [2/3] RUN apt-get update && apt-get install -y --no-install-recommends     make gcc libc6-dev python3     gcc-arm-none-eabi=15:10.3-2021.07-4     binutils-arm-none-eabi=2.38-3ubuntu1+15build1     libnewlib-arm-none-eabi=3.3.0-1.3     ca-certificates     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [3/3] WORKDIR /workspace
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 exporting manifest sha256:55d661e1d92d343ad608d4e86d5943ecc8f53467f632099a446891b6c24222ac done
+#7 exporting config sha256:b63b81ffba64436ca8d2925dd552ac6a5a0cc0fb678fa15c2e8c734c8e4c8fff done
+#7 exporting attestation manifest sha256:878f816bc7ffca771a36d1902e2e647d748554f6b9b23276936695d03388bcf0 0.0s done
+#7 exporting manifest list sha256:51530e9f4d31117395ad9adde496ff375f1dcbf258a76f42139aef92a9753d06 0.0s done
+#7 naming to docker.io/library/stm32c0-wokwi-build:local done
+#7 unpacking to docker.io/library/stm32c0-wokwi-build:local
+#7 unpacking to docker.io/library/stm32c0-wokwi-build:local 24.2s done
+#7 DONE 24.4s
+docker run --rm -v "/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer:/workspace" -w /workspace stm32c0-wokwi-build:local make test
+python3 tools/check_project.py
+PASS portable dependencies and TiltTrainer wiring/IOC
+make -C tests test
+make[1]: Entering directory '/workspace/tests'
+mkdir -p build/Linux-aarch64
+cc -DTT_TEST_ALL -I"/workspace/firmware/Sensors" -I"/workspace/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror test_imu.c test_trainer.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c -lm -o build/Linux-aarch64/test_trainer
+./build/Linux-aarch64/test_trainer
+PASS imu: register sequence, signed units, NACK/timeout/ID, output preservation
+PASS T03: debounce, bounce, hold, rearm, tick wrap; periodic deadlines
+PASS T01/T04/T05: 50 fresh samples, inclined baseline, rejection retention, deadline, nested press, wrap
+PASS T06/T07: vector error_max=0.000012 deg, 4096 monotonic ADC codes and endpoints
+PASS T08/T09: exact boundaries, 100 ms, hysteresis, 40 ms excursion, overflow
+PASS T10/T11/T12: LED validity, failed reads, ADC fault, sensor recovery, 1 s stable, stale-filter removal
+PASS T13 host scheduler: duration=60000 ms MPU=3000 max=20 ms ADC=600 UART=300 max=200 ms presses=6
+PASS all TiltTrainer host groups
+make[1]: Leaving directory '/workspace/tests'
