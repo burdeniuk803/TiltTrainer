@@ -129,6 +129,8 @@ void tt_trainer_sample(tt_trainer *t, const tt_sample *sample, tt_io_result stat
     return;
   }
   if (t->mode!=TT_CALIBRATING) return;
+  if (t->cal_count && now==previous) return;
+  if (t->cal_count && (uint32_t)(now-previous)>30U) { reject(t,"SAMPLE_GAP",false); return; }
   if (now==t->cal_started) return; /* A sample from the request tick is not new. */
   if (!stable) { reject(t,status==TT_IO_OK?"MOTION":"READ_ERROR",false); return; }
   ++t->cal_count;

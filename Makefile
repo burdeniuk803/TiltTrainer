@@ -23,6 +23,6 @@ coverage:
 sanitize:
 	$(MAKE) -C tests sanitize
 test-linux: image
-	docker run --rm -v "$(CURDIR):/workspace" -w /workspace $(IMAGE) make test
+	docker run --rm -v "$(CURDIR):/workspace" -w /workspace --user "$(shell id -u):$(shell id -g)" $(IMAGE) make test
 coverage-linux: image
-	docker run --rm -v "$(CURDIR):/workspace" -w /workspace $(IMAGE) make coverage GCOV=gcov
+	docker run --rm -v "$(CURDIR):/workspace" -w /workspace --user "$(shell id -u):$(shell id -g)" $(IMAGE) make coverage GCOV=gcov

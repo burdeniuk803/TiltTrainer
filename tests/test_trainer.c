@@ -66,6 +66,10 @@ static void test_calibration(void)
   tt_trainer_sample(&t,&bad,TT_IO_OK,20); assert(t.mode==TT_WAIT_BASE && !t.base_valid);
   tt_request_base(&t,50); tt_trainer_sample(&t,&upright,TT_IO_NACK,70);
   assert(t.event==TT_CAL_REJECT && strcmp(t.reason,"READ_ERROR")==0);
+  tt_trainer_init(&t); tt_request_base(&t,0);
+  tt_trainer_sample(&t,&upright,TT_IO_OK,20);
+  tt_trainer_sample(&t,&upright,TT_IO_OK,61);
+  assert(t.event==TT_CAL_REJECT && strcmp(t.reason,"SAMPLE_GAP")==0);
   tt_trainer_init(&t); calibrate(&t,pose(30,0),UINT32_MAX-500U);
   assert(fabsf(t.base[0]-0.5f)<0.0001f);
   puts("PASS T01/T04/T05: 50 fresh samples, inclined baseline, rejection retention, deadline, nested press, wrap");

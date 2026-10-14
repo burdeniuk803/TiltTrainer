@@ -67,8 +67,10 @@ void tt_board_start(void)
   HAL_Delay(100); /* Only power-on settling; never in the measurement loop. */
   HAL_NVIC_SetPriority(USART2_IRQn,1,0);
   HAL_NVIC_EnableIRQ(USART2_IRQn);
-  HAL_ADCEx_Calibration_Start(&hadc1);
-  read_adc(); uint8_t id=0;
+  bool calibrated=HAL_ADCEx_Calibration_Start(&hadc1)==HAL_OK;
+  read_adc();
+  if (!calibrated) { adc_ok=false; tt_trainer_adc(&trainer,false,0); }
+  uint8_t id=0;
   imu_status=tt_imu_start(&imu,&id);
   tt_sensor_start_result(&trainer,imu_status);
   uint32_t now=HAL_GetTick();
@@ -82,12 +84,25 @@ void tt_board_start(void)
   log_line("READY mode=%s valid=0 angle_deg=NA commands=i:id,d:data,n:nack,r:reset,f:fault\r\n",tt_mode_name(trainer.mode));
   trainer.event=TT_NO_EVENT;
 }
+static void report_event(uint32_t now)
+{
+  if (trainer.event==TT_NO_EVENT) return;
+  log_line("EVENT t_ms=%lu event=%s mode=%s samples=%u reason=%s state=%s valid=%u\r\n",
+    (unsigned long)now,tt_event_name(trainer.event),tt_mode_name(trainer.mode),trainer.cal_count,
+    trainer.reason,trainer.boundary.position==TT_OUTSIDE?"OUTSIDE":"WITHIN",(unsigned)trainer.valid);
+  if (trainer.event==TT_CAL_OK)
+    log_line("BASE t_ms=%lu x_mg=%d y_mg=%d z_mg=%d\r\n",(unsigned long)now,
+      (int)(trainer.base[0]*1000.0f),(int)(trainer.base[1]*1000.0f),(int)(trainer.base[2]*1000.0f));
+  trainer.event=TT_NO_EVENT;
+}
 void tt_board_poll(void)
 {
   uint32_t now=HAL_GetTick(); uart_service();
   tt_trainer_tick(&trainer,now);
+  report_event(now);
   if (tt_button_update(&button,HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_0)==GPIO_PIN_RESET,now))
     tt_request_base(&trainer,now);
+  report_event(now);
   if (trainer.mode==TT_SENSOR_ERROR && tt_due(&retry_clock,now)) {
     uint8_t id=0; imu_status=tt_imu_start(&imu,&id);
     log_line("RETRY t_ms=%lu status=%s id=0x%02X\r\n",(unsigned long)now,tt_io_name(imu_status),id);
@@ -99,15 +114,14 @@ void tt_board_poll(void)
       --fault_reads; imu.address=0x69; imu_status=tt_imu_read(&imu,&sample); imu.address=0x68;
     } else imu_status=tt_imu_read(&imu,&sample);
     HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,GPIO_PIN_RESET);
+    tt_mode previous=trainer.mode;
     tt_trainer_sample(&trainer,&sample,imu_status,HAL_GetTick());
+    if (previous!=TT_SENSOR_ERROR && trainer.mode==TT_SENSOR_ERROR) retry_clock.last=HAL_GetTick();
+    report_event(HAL_GetTick());
   }
   if (tt_due(&adc_clock,now)) read_adc();
   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,tt_led(&trainer)?GPIO_PIN_SET:GPIO_PIN_RESET);
-  if (trainer.event!=TT_NO_EVENT) {
-    log_line("EVENT t_ms=%lu event=%s mode=%s samples=%u reason=%s state=%s\r\n",
-      (unsigned long)now,tt_event_name(trainer.event),tt_mode_name(trainer.mode),trainer.cal_count,trainer.reason,trainer.boundary.position==TT_OUTSIDE?"OUTSIDE":"WITHIN");
-    trainer.event=TT_NO_EVENT;
-  }
+  report_event(HAL_GetTick());
   if (tt_due(&uart_clock,now)) {
     char angle[16]="NA", limit[16]="NA";
     if (trainer.valid) { unsigned value=(unsigned)(trainer.angle*10.0f+0.5f); snprintf(angle,sizeof angle,"%u.%u",value/10U,value%10U); }
@@ -118,13 +132,22 @@ void tt_board_poll(void)
   if (__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)) {
     uint8_t command;
     if (HAL_UART_Receive(&huart2,&command,1,1)!=HAL_OK) return;
-    if (command=='r') { log_line("EVENT t_ms=%lu event=RESET\r\n",(unsigned long)now); NVIC_SystemReset(); }
+    if (command=='r') NVIC_SystemReset();
     if (command=='f') { fault_reads=3; log_line("FAULT t_ms=%lu reads=3 address=0x69\r\n",(unsigned long)now); }
     if (command=='i') { uint8_t id=0; tt_io_result result=bus_read(&hi2c1,0x68,0x75,&id,1); log_line("ID t_ms=%lu status=%s id=0x%02X\r\n",(unsigned long)now,tt_io_name(result),id); }
     if (command=='n') { uint8_t id=0; tt_io_result result=bus_read(&hi2c1,0x69,0x75,&id,1); log_line("PROBE t_ms=%lu address=0x69 status=%s\r\n",(unsigned long)now,tt_io_name(result)); }
     if (command=='d') {
-      log_line("RAW t_ms=%lu status=%s bytes=",(unsigned long)now,tt_io_name(imu_status));
-      if (imu_status==TT_IO_OK) for (unsigned i=0;i<14;++i) log_line("%02X",sample.raw[i]);
+      tt_sample diagnostic;
+      tt_io_result result=tt_imu_read(&imu,&diagnostic);
+      log_line("RAW t_ms=%lu status=%s bytes=",(unsigned long)now,tt_io_name(result));
+      if (result==TT_IO_OK) {
+        for (unsigned i=0;i<14;++i) log_line("%02X",diagnostic.raw[i]);
+        log_line(" ax_mg=%d ay_mg=%d az_mg=%d gx_mdps=%d gy_mdps=%d gz_mdps=%d temp_mc=%d",
+          (int)(diagnostic.acceleration[0]*1000),(int)(diagnostic.acceleration[1]*1000),
+          (int)(diagnostic.acceleration[2]*1000),(int)(diagnostic.angular_rate[0]*1000),
+          (int)(diagnostic.angular_rate[1]*1000),(int)(diagnostic.angular_rate[2]*1000),
+          (int)(diagnostic.temperature*1000));
+      }
       log_line("\r\n");
     }
   }

@@ -2,18 +2,18 @@ docker build -t stm32c0-wokwi-build:local docker
 #0 building with "desktop-linux" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 476B 0.0s done
+#1 transferring dockerfile: 476B done
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401
-#2 DONE 0.1s
+#2 DONE 0.0s
 
 #3 [internal] load .dockerignore
-#3 transferring context: 2B 0.0s done
+#3 transferring context: 2B done
 #3 DONE 0.0s
 
 #4 [1/3] FROM docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401
-#4 resolve docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401 0.0s done
+#4 resolve docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401 done
 #4 DONE 0.0s
 
 #5 [2/3] RUN apt-get update && apt-get install -y --no-install-recommends     make gcc libc6-dev python3     gcc-arm-none-eabi=15:10.3-2021.07-4     binutils-arm-none-eabi=2.38-3ubuntu1+15build1     libnewlib-arm-none-eabi=3.3.0-1.3     ca-certificates     && rm -rf /var/lib/apt/lists/*
@@ -26,13 +26,12 @@ docker build -t stm32c0-wokwi-build:local docker
 #7 exporting layers done
 #7 exporting manifest sha256:55d661e1d92d343ad608d4e86d5943ecc8f53467f632099a446891b6c24222ac done
 #7 exporting config sha256:b63b81ffba64436ca8d2925dd552ac6a5a0cc0fb678fa15c2e8c734c8e4c8fff done
-#7 exporting attestation manifest sha256:5157b0badebaf964bdbbbaf58bc0cae7d9d23f48b7b768ebbb34787b2d3b168a 0.0s done
-#7 exporting manifest list sha256:026feb001bb6d6648e2979bd762c0bb33d58e6e25b0b7c6f9c45ea882d527468 0.0s done
-#7 naming to docker.io/library/stm32c0-wokwi-build:local
+#7 exporting attestation manifest sha256:30a2cb8b56cd91935f4a899c75d6a876eaa8668edacb62534ae6ecc45f9338c3 done
+#7 exporting manifest list sha256:6743e6811910557cb6c3f7412dcfa0c215a3ad8f572796c3acbbf8e4ba8a4e1b done
 #7 naming to docker.io/library/stm32c0-wokwi-build:local done
-#7 unpacking to docker.io/library/stm32c0-wokwi-build:local 0.0s done
-#7 DONE 0.2s
-docker run --rm -v "/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer:/workspace" -w /workspace stm32c0-wokwi-build:local make coverage GCOV=gcov
+#7 unpacking to docker.io/library/stm32c0-wokwi-build:local done
+#7 DONE 0.0s
+docker run --rm -v "/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer:/workspace" -w /workspace --user "501:20" stm32c0-wokwi-build:local make coverage GCOV=gcov
 make -C tests coverage GCOV="gcov"
 make[1]: Entering directory '/workspace/tests'
 rm -rf coverage/Linux-aarch64
@@ -56,10 +55,10 @@ Calls executed:100.00% of 7
 Creating 'mpu6050.c.gcov'
 
 File '../../../firmware/Trainer/trainer.c'
-Lines executed:95.31% of 128
-Branches executed:100.00% of 151
-Taken at least once:86.09% of 151
-Calls executed:96.15% of 26
+Lines executed:95.38% of 130
+Branches executed:100.00% of 159
+Taken at least once:86.16% of 159
+Calls executed:96.30% of 27
 Creating 'trainer.c.gcov'
 
 File '../../../firmware/Trainer/timing.c'
@@ -69,5 +68,5 @@ Taken at least once:91.67% of 12
 No calls
 Creating 'timing.c.gcov'
 
-Lines executed:95.45% of 176
+Lines executed:95.51% of 178
 make[1]: Leaving directory '/workspace/tests'
