@@ -26,8 +26,8 @@ docker build -t stm32c0-wokwi-build:local docker
 #7 exporting layers done
 #7 exporting manifest sha256:55d661e1d92d343ad608d4e86d5943ecc8f53467f632099a446891b6c24222ac done
 #7 exporting config sha256:b63b81ffba64436ca8d2925dd552ac6a5a0cc0fb678fa15c2e8c734c8e4c8fff done
-#7 exporting attestation manifest sha256:30a2cb8b56cd91935f4a899c75d6a876eaa8668edacb62534ae6ecc45f9338c3 done
-#7 exporting manifest list sha256:6743e6811910557cb6c3f7412dcfa0c215a3ad8f572796c3acbbf8e4ba8a4e1b done
+#7 exporting attestation manifest sha256:9f2afb1f540a19d318dd08656e24a185cb09a0bff340e4ed62e97cd023b1f607 done
+#7 exporting manifest list sha256:24f1c026fbea1d09149f4dd9e14fa81ec30c99b0eb428a19511bdd7c7989c78c done
 #7 naming to docker.io/library/stm32c0-wokwi-build:local done
 #7 unpacking to docker.io/library/stm32c0-wokwi-build:local done
 #7 DONE 0.0s
@@ -36,9 +36,10 @@ make -C tests coverage GCOV="gcov"
 make[1]: Entering directory '/workspace/tests'
 rm -rf coverage/Linux-aarch64
 mkdir -p coverage/Linux-aarch64
-cd coverage/Linux-aarch64 && cc -DTT_TEST_ALL -I"/workspace/firmware/Sensors" -I"/workspace/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror --coverage ../../test_imu.c ../../test_trainer.c ../../../firmware/Sensors/mpu6050.c ../../../firmware/Trainer/trainer.c ../../../firmware/Trainer/timing.c -lm -o test_trainer
+cd coverage/Linux-aarch64 && cc -DTT_TEST_ALL -I"/workspace/firmware/Sensors" -I"/workspace/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror --coverage ../../test_imu.c ../../test_trainer.c ../../test_recorded.c ../../../firmware/Sensors/mpu6050.c ../../../firmware/Trainer/trainer.c ../../../firmware/Trainer/timing.c -lm -o test_trainer
 ./coverage/Linux-aarch64/test_trainer
 PASS imu: register sequence, signed units, NACK/timeout/ID, output preservation
+PASS recorded Wokwi frames: units, temperature, 30.5 deg, tilted baseline, motion
 PASS T03: debounce, bounce, hold, rearm, tick wrap; periodic deadlines
 PASS T01/T04/T05: 50 fresh samples, inclined baseline, rejection retention, deadline, nested press, wrap
 PASS T06/T07: vector error_max=0.000012 deg, 4096 monotonic ADC codes and endpoints
@@ -48,16 +49,16 @@ PASS T13 host scheduler: duration=60000 ms MPU=3000 max=20 ms ADC=600 UART=300 m
 PASS all TiltTrainer host groups
 cd coverage/Linux-aarch64 && gcov -b -c test_trainer-mpu6050.gcno test_trainer-trainer.gcno test_trainer-timing.gcno
 File '../../../firmware/Sensors/mpu6050.c'
-Lines executed:93.55% of 31
-Branches executed:100.00% of 17
-Taken at least once:88.24% of 17
+Lines executed:100.00% of 32
+Branches executed:100.00% of 18
+Taken at least once:100.00% of 18
 Calls executed:100.00% of 7
 Creating 'mpu6050.c.gcov'
 
 File '../../../firmware/Trainer/trainer.c'
-Lines executed:95.38% of 130
-Branches executed:100.00% of 159
-Taken at least once:86.16% of 159
+Lines executed:95.42% of 131
+Branches executed:100.00% of 161
+Taken at least once:86.34% of 161
 Calls executed:96.30% of 27
 Creating 'trainer.c.gcov'
 
@@ -68,5 +69,5 @@ Taken at least once:91.67% of 12
 No calls
 Creating 'timing.c.gcov'
 
-Lines executed:95.51% of 178
+Lines executed:96.67% of 180
 make[1]: Leaving directory '/workspace/tests'

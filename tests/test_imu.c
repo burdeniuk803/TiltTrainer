@@ -27,8 +27,8 @@ void test_imu(void)
 {
   fake f = {.id=0x68}; tt_imu imu = {&f,read_reg,write_reg,0x68}; uint8_t id;
   assert(tt_imu_start(&imu,&id) == TT_IO_OK && id == 0x68 && f.calls == 6);
-  for (int kind=0; kind<2; ++kind) for (int step=1; step<=6; ++step) {
-    f.calls=0; f.fail=step; f.error=kind ? TT_IO_TIMEOUT : TT_IO_NACK;
+  for (int kind=0; kind<3; ++kind) for (int step=1; step<=6; ++step) {
+    f.calls=0; f.fail=step; f.error=kind==2 ? TT_IO_BUS_ERROR : kind==1 ? TT_IO_TIMEOUT : TT_IO_NACK;
     assert(tt_imu_start(&imu,&id) == f.error && f.calls == step);
   }
   f.calls=0; f.fail=0; f.id=0x69;
@@ -40,6 +40,10 @@ void test_imu(void)
   assert(s.angular_rate[0]==-1 && s.angular_rate[1]==1 && fabsf(s.temperature-24)<0.01f);
   tt_sample before=s; f.fail=f.calls+1; f.error=TT_IO_TIMEOUT;
   assert(tt_imu_read(&imu,&s)==TT_IO_TIMEOUT && memcmp(&s,&before,sizeof s)==0);
+  assert(strcmp(tt_io_name(TT_IO_OK),"OK")==0);
+  assert(strcmp(tt_io_name(TT_IO_NACK),"NACK")==0);
+  assert(strcmp(tt_io_name(TT_IO_TIMEOUT),"TIMEOUT")==0);
+  assert(strcmp(tt_io_name(TT_IO_BUS_ERROR),"BUS_ERROR")==0);
   assert(strcmp(tt_io_name(TT_IO_BAD_ID),"BAD_ID")==0);
   assert(strcmp(tt_io_name((tt_io_result)99),"UNKNOWN")==0);
   puts("PASS imu: register sequence, signed units, NACK/timeout/ID, output preservation");

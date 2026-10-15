@@ -12,4 +12,5 @@ jobs:
       - run: make build
       - run: make test-linux
       - run: make coverage-linux
+      - run: python3 tools/check_coverage.py tests/coverage/Linux-x86_64
       - run: make sanitize

@@ -6,7 +6,7 @@ docker build -t stm32c0-wokwi-build:local docker
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/ubuntu:22.04@sha256:5ec03bb3441e8b0bf3b4f9cd4629a1ae763010dc3035bb8da3ae6cf026486401
-#2 DONE 0.0s
+#2 DONE 0.1s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 2B done
@@ -26,21 +26,21 @@ docker build -t stm32c0-wokwi-build:local docker
 #7 exporting layers done
 #7 exporting manifest sha256:55d661e1d92d343ad608d4e86d5943ecc8f53467f632099a446891b6c24222ac done
 #7 exporting config sha256:b63b81ffba64436ca8d2925dd552ac6a5a0cc0fb678fa15c2e8c734c8e4c8fff done
-#7 exporting attestation manifest sha256:bfab1b5803211b18a18b360282c33f897605ad423708ed178c9cfc648fbf7bc4 done
-#7 exporting manifest list sha256:01c6479d239d8dbdfc87adf30e3c60d918abc75060a8bd231ed70ab2283b8061 done
+#7 exporting attestation manifest sha256:c900dc7cd7ff084c57bf1ed76dc4b94af1b80152a5a00030e2bc671db59ccd37 0.0s done
+#7 exporting manifest list sha256:6511f6e5b2b8452d78ae7ed5db2a8360ae3be04a4c4915afa6ddec4a0ab46b85 done
 #7 naming to docker.io/library/stm32c0-wokwi-build:local done
-#7 unpacking to docker.io/library/stm32c0-wokwi-build:local
-#7 unpacking to docker.io/library/stm32c0-wokwi-build:local 3.2s done
-#7 DONE 3.3s
+#7 unpacking to docker.io/library/stm32c0-wokwi-build:local done
+#7 DONE 0.0s
 docker run --rm -v "/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer:/workspace" -w /workspace --user "501:20" stm32c0-wokwi-build:local make test
 python3 tools/check_project.py
 PASS portable dependencies and TiltTrainer wiring/IOC
 make -C tests test
 make[1]: Entering directory '/workspace/tests'
 mkdir -p build/Linux-aarch64
-cc -DTT_TEST_ALL -I"/workspace/firmware/Sensors" -I"/workspace/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror test_imu.c test_trainer.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c -lm -o build/Linux-aarch64/test_trainer
+cc -DTT_TEST_ALL -I"/workspace/firmware/Sensors" -I"/workspace/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror test_imu.c test_trainer.c test_recorded.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c -lm -o build/Linux-aarch64/test_trainer
 ./build/Linux-aarch64/test_trainer
 PASS imu: register sequence, signed units, NACK/timeout/ID, output preservation
+PASS recorded Wokwi frames: units, temperature, 30.5 deg, tilted baseline, motion
 PASS T03: debounce, bounce, hold, rearm, tick wrap; periodic deadlines
 PASS T01/T04/T05: 50 fresh samples, inclined baseline, rejection retention, deadline, nested press, wrap
 PASS T06/T07: vector error_max=0.000012 deg, 4096 monotonic ADC codes and endpoints

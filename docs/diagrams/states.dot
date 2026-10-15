@@ -1,0 +1,28 @@
+digraph states {
+  graph [rankdir=TB, bgcolor="white", nodesep=.52, ranksep=.64,dpi=240];
+  node [shape=box,style="rounded,filled",fillcolor="#f6f7f8",color="#46586b",fontname="DejaVu Serif",fontsize=16,margin=".18,.14"];
+  edge [fontname="DejaVu Serif",fontsize=12,color="#46586b",arrowsize=.8];
+  boot [label="Старт / reset",shape=ellipse];
+  wait [label="WAIT_BASE\nеталона немає · кут NA · LED LOW"];
+  cal [label="CALIBRATING\n50 нових стабільних вимірів"];
+  train [label="TRAINING\nWITHIN / OUTSIDE\nLED HIGH лише для OUTSIDE"];
+  unstable [label="UNSTABLE\nкут NA · LED LOW"];
+  error [label="SENSOR_ERROR\nкут NA · LED LOW\nповтор init раз на 1 с"];
+  boot -> wait [label="self-test OK"];
+  boot -> error [label="ID / I²C error"];
+  wait -> cal [label="LOW 30 мс"];
+  train -> cal [label="новий натиск"];
+  unstable -> cal [label="новий натиск"];
+  cal -> train [label="CAL_OK"];
+  cal -> wait [label="CAL_REJECT\nбез еталона"];
+  cal -> unstable [label="CAL_REJECT\nрух + старий еталон"];
+  cal -> train [label="CAL_REJECT\nvariance + старий еталон",style=dashed];
+  train -> unstable [label="норма / gyro\nпоза межами"];
+  unstable -> train [label="1 с стабільних\nданих; чистий фільтр"];
+  train -> error [label="3 помилки читання"];
+  wait -> error [label="3 помилки читання",style=dashed];
+  cal -> error [label="3 помилки читання",style=dashed];
+  error -> wait [label="init OK; еталон скинуто"];
+  {rank=same;wait;error}
+  {rank=same;train;unstable}
+}

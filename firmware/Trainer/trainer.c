@@ -105,8 +105,9 @@ void tt_trainer_sample(tt_trainer *t, const tt_sample *sample, tt_io_result stat
   if (status!=TT_IO_OK) {
     clear_window(t); t->boundary.pending=false; t->recovering=false;
     if (++t->read_errors>=3) {
-      t->mode=TT_SENSOR_ERROR; t->valid=false; t->base_valid=false;
-      t->reason=tt_io_name(status); t->event=TT_MODE_CHANGE; return;
+      bool calibrating=t->mode==TT_CALIBRATING;
+      t->mode=TT_SENSOR_ERROR; t->valid=false;
+      t->reason=tt_io_name(status); t->event=calibrating?TT_CAL_REJECT:TT_MODE_CHANGE; return;
     }
     if (t->mode==TT_CALIBRATING) reject(t,"READ_ERROR",false);
     return;

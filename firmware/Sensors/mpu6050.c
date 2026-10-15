@@ -45,6 +45,7 @@ const char *tt_io_name(tt_io_result result)
     case TT_IO_NACK: return "NACK";
     case TT_IO_TIMEOUT: return "TIMEOUT";
     case TT_IO_BAD_ID: return "BAD_ID";
+    case TT_IO_BUS_ERROR: return "BUS_ERROR";
   }
   return "UNKNOWN";
 }

@@ -37,6 +37,7 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Board/runtime.c \
+Board/i2c_bus.c \
 Sensors/mpu6050.c \
 Trainer/timing.c \
 Trainer/trainer.c \
@@ -110,7 +111,9 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
+WOKWI ?= 1
 C_DEFS =  \
+-DTT_WOKWI=$(WOKWI) \
 -DUSE_HAL_DRIVER \
 -DSTM32C031xx
 

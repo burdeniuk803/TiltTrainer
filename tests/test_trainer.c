@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 void test_imu(void);
+void test_recorded(void);
 static const tt_sample upright={.acceleration={0,0,1}};
 static tt_sample pose(float degrees, unsigned axis)
 {
@@ -70,6 +71,12 @@ static void test_calibration(void)
   tt_trainer_sample(&t,&upright,TT_IO_OK,20);
   tt_trainer_sample(&t,&upright,TT_IO_OK,61);
   assert(t.event==TT_CAL_REJECT && strcmp(t.reason,"SAMPLE_GAP")==0);
+  tt_trainer_init(&t); calibrate(&t,upright,100);
+  tt_trainer_sample(&t,&upright,TT_IO_NACK,1120);
+  tt_trainer_sample(&t,&upright,TT_IO_NACK,1140);
+  tt_request_base(&t,1145);
+  tt_trainer_sample(&t,&upright,TT_IO_NACK,1160);
+  assert(t.event==TT_CAL_REJECT && t.mode==TT_SENSOR_ERROR && t.base_valid);
   tt_trainer_init(&t); calibrate(&t,pose(30,0),UINT32_MAX-500U);
   assert(fabsf(t.base[0]-0.5f)<0.0001f);
   puts("PASS T01/T04/T05: 50 fresh samples, inclined baseline, rejection retention, deadline, nested press, wrap");
@@ -133,7 +140,7 @@ static void test_safety(void)
   tt_trainer_sample(&t,&tilt,TT_IO_NACK,now+20); assert(!t.valid && !tt_led(&t));
   tt_trainer_sample(&t,&tilt,TT_IO_OK,now+40); assert(t.read_errors==0);
   for(unsigned i=1;i<=3;++i) tt_trainer_sample(&t,&tilt,TT_IO_TIMEOUT,now+40+i*20);
-  assert(t.mode==TT_SENSOR_ERROR && !t.base_valid && !t.valid && !tt_led(&t));
+  assert(t.mode==TT_SENSOR_ERROR && t.base_valid && !t.valid && !tt_led(&t));
   tt_request_base(&t,now+110); assert(t.mode==TT_SENSOR_ERROR);
   tt_trainer_sample(&t,&upright,TT_IO_OK,now+120); assert(t.mode==TT_SENSOR_ERROR);
   tt_sensor_start_result(&t,TT_IO_BAD_ID); assert(t.mode==TT_SENSOR_ERROR);
@@ -183,6 +190,6 @@ static void test_concurrency(void)
 }
 int main(void)
 {
-  test_imu();test_button_clock();test_calibration();test_angles_adc();test_thresholds();test_safety();test_concurrency();
+  test_imu(); test_recorded();test_button_clock();test_calibration();test_angles_adc();test_thresholds();test_safety();test_concurrency();
   puts("PASS all TiltTrainer host groups"); return 0;
 }

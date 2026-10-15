@@ -1,4 +1,5 @@
 #include "runtime.h"
+#include "i2c_bus.h"
 #include "main.h"
 #include "mpu6050.h"
 #include "timing.h"
@@ -9,20 +10,7 @@
 extern I2C_HandleTypeDef hi2c1;
 extern ADC_HandleTypeDef hadc1;
 extern UART_HandleTypeDef huart2;
-static tt_io_result io_status(HAL_StatusTypeDef result)
-{
-  if (result == HAL_OK) return TT_IO_OK;
-  return result == HAL_TIMEOUT ? TT_IO_TIMEOUT : TT_IO_NACK;
-}
-static tt_io_result bus_read(void *ctx, uint8_t address, uint8_t reg, uint8_t *data, size_t length)
-{
-  return io_status(HAL_I2C_Mem_Read(ctx,(uint16_t)(address<<1),reg,I2C_MEMADD_SIZE_8BIT,data,(uint16_t)length,10));
-}
-static tt_io_result bus_write(void *ctx, uint8_t address, uint8_t reg, uint8_t value)
-{
-  return io_status(HAL_I2C_Mem_Write(ctx,(uint16_t)(address<<1),reg,I2C_MEMADD_SIZE_8BIT,&value,1,10));
-}
-static tt_imu imu = {&hi2c1,bus_read,bus_write,0x68};
+static tt_imu imu = {&hi2c1,tt_bus_read,tt_bus_write,0x68};
 static tt_clock mpu_clock, adc_clock, uart_clock, retry_clock;
 static tt_button button;
 static uint16_t adc;
@@ -134,8 +122,8 @@ void tt_board_poll(void)
     if (HAL_UART_Receive(&huart2,&command,1,1)!=HAL_OK) return;
     if (command=='r') NVIC_SystemReset();
     if (command=='f') { fault_reads=3; log_line("FAULT t_ms=%lu reads=3 address=0x69\r\n",(unsigned long)now); }
-    if (command=='i') { uint8_t id=0; tt_io_result result=bus_read(&hi2c1,0x68,0x75,&id,1); log_line("ID t_ms=%lu status=%s id=0x%02X\r\n",(unsigned long)now,tt_io_name(result),id); }
-    if (command=='n') { uint8_t id=0; tt_io_result result=bus_read(&hi2c1,0x69,0x75,&id,1); log_line("PROBE t_ms=%lu address=0x69 status=%s\r\n",(unsigned long)now,tt_io_name(result)); }
+    if (command=='i') { uint8_t id=0; tt_io_result result=tt_bus_read(&hi2c1,0x68,0x75,&id,1); log_line("ID t_ms=%lu status=%s id=0x%02X\r\n",(unsigned long)now,tt_io_name(result),id); }
+    if (command=='n') { uint8_t id=0; tt_io_result result=tt_bus_read(&hi2c1,0x69,0x75,&id,1); log_line("PROBE t_ms=%lu address=0x69 status=%s\r\n",(unsigned long)now,tt_io_name(result)); }
     if (command=='d') {
       tt_sample diagnostic;
       tt_io_result result=tt_imu_read(&imu,&diagnostic);

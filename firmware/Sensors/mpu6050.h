@@ -2,7 +2,7 @@
 #define TT_MPU6050_H
 #include <stddef.h>
 #include <stdint.h>
-typedef enum { TT_IO_OK, TT_IO_NACK, TT_IO_TIMEOUT, TT_IO_BAD_ID } tt_io_result;
+typedef enum { TT_IO_OK, TT_IO_NACK, TT_IO_TIMEOUT, TT_IO_BAD_ID, TT_IO_BUS_ERROR } tt_io_result;
 typedef struct {
   void *context;
   tt_io_result (*read)(void *, uint8_t, uint8_t, uint8_t *, size_t);

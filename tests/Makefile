@@ -5,7 +5,7 @@ BUILD := build/$(TAG)
 COVERAGE := coverage/$(TAG)
 CPPFLAGS := -DTT_TEST_ALL -I"$(abspath ../firmware/Sensors)" -I"$(abspath ../firmware/Trainer)"
 CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Werror
-SOURCES := test_imu.c test_trainer.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c
+SOURCES := test_imu.c test_trainer.c test_recorded.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c
 .PHONY: test coverage sanitize clean
 test: $(BUILD)/test_trainer
 	./$(BUILD)/test_trainer
