@@ -1,0 +1,13 @@
+{
+  "verified_date": "2026-10-15",
+  "files": {
+    "firmware/Board/runtime.c": "144a9105f59af78341fb84feb3a4adae24806909f6d6a10be5a30069fb39e6e3",
+    "firmware/Board/i2c_bus.c": "5561fc718ef00bbf0b60440415249ab88ec22343ddaad05e172d128640d1e615",
+    "firmware/Sensors/mpu6050.c": "f87e0c1ade3629d8aaac7505384dded2233d962a9b0d6d7a2591ea4a974bdf6d",
+    "firmware/Trainer/trainer.c": "1fd2fc6f153a7306f41c8d4231f3cb64048fb086e05a5ce1e20c0d146e49bbb2",
+    "firmware/Trainer/timing.c": "8643ac44955783448e1b590156eb45299905a238755f1b398474b03d1fb1353d",
+    "diagram.json": "509b2aa0b90c27d0d43db8911a86e9c542f0807ccd395e3b5e2b1cc567a2d751"
+  },
+  "firmware_record": "../captures/recorded-firmware.sha256",
+  "capture_index": "../captures/full-recordings.json"
+}
