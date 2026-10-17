@@ -1,0 +1,10 @@
+/Library/Developer/CommandLineTools/usr/bin/make -C tests coverage GCOV="xcrun llvm-cov gcov"
+rm -rf coverage/Darwin-arm64
+mkdir -p coverage/Darwin-arm64
+cd coverage/Darwin-arm64 && cc -DTT_TEST_ALL -I/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Sensors -I/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Trainer -std=c11 -O0 -g -Wall -Wextra -Werror --coverage ../../test_imu.c ../../test_trainer.c ../../../firmware/Sensors/mpu6050.c ../../../firmware/Trainer/trainer.c ../../../firmware/Trainer/timing.c -lm -o test_trainer
+clang: error: no such file or directory: 'Дмитро'
+clang: error: no such file or directory: 'Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Sensors'
+clang: error: no such file or directory: 'Дмитро'
+clang: error: no such file or directory: 'Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Trainer'
+make[1]: *** [coverage] Error 1
+make: *** [coverage] Error 2

@@ -1,0 +1,23 @@
+[
+  {
+    "file": "final-adapter-long-full.vcd",
+    "sha256": "c91749a80f0b0bb871c5eb3afb584b8dd52ce7b068483d0248d8f2bddbdb81c6",
+    "recorded_date_utc": "2026-10-13",
+    "bytes": 81722296,
+    "gzip_bytes": 12604690
+  },
+  {
+    "file": "final-calibration-fault-full.vcd",
+    "sha256": "a875d162c7a6536feb7ca6946c3a7fd4397628cd3bfe0525e428385a8d7bf464",
+    "recorded_date_utc": "2026-10-13",
+    "bytes": 81703688,
+    "gzip_bytes": 12760011
+  },
+  {
+    "file": "final-inclined-adc-reset-full.vcd",
+    "sha256": "1aa1d59a4ddbc4cf8200e02319d52e5519002b397bf6e4d0b91d217faf303032",
+    "recorded_date_utc": "2026-10-13",
+    "bytes": 40262471,
+    "gzip_bytes": 6452764
+  }
+]

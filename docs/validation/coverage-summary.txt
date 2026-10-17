@@ -1,0 +1,3 @@
+mpu6050: lines=32/32 100.00% branch_taken=18/18 100.00%
+trainer: lines=125/131 95.42% branch_taken=139/161 86.34%
+timing: lines=17/17 100.00% branch_taken=11/12 91.67%

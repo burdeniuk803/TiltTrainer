@@ -1,0 +1,18 @@
+digraph components {
+  graph [rankdir=TB, bgcolor="white", nodesep=.38, ranksep=.58, dpi=240];
+  node [shape=box, style="rounded,filled", fillcolor="#f6f7f8", color="#46586b", fontname="DejaVu Serif", fontsize=16, margin=".20,.14"];
+  edge [color="#46586b", arrowsize=.8];
+  core [label="Core\nініціалізація\nmain · IRQ"];
+  board [label="Board/runtime + i2c_bus\nпланування · self-test\nUART · GPIO · ADC"];
+  imu [label="Sensors/mpu6050\nрегістри · статус\nфізичні одиниці"];
+  trainer [label="Trainer/trainer\nеталон · фільтр\nкут · стани"];
+  timing [label="Trainer/timing\ndebounce · періоди\ntick wrap"];
+  hal [label="Drivers\nST HAL 1.0.1 · CMSIS"];
+  bus [label="tt_imu\ncontext · read/write callbacks"];
+  tests [label="Host tests\nfake I²C · вектори · clock",style="rounded,dashed"];
+  core -> board; board -> imu; board -> trainer; board -> timing; board -> hal;
+  imu -> bus; board -> bus; trainer -> imu;
+  tests -> imu [style=dashed]; tests -> trainer [style=dashed]; tests -> timing [style=dashed];
+  {rank=same;imu;trainer;timing}
+  {rank=same;bus;hal;tests}
+}

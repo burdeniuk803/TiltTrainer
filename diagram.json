@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "author": "template",
+  "author": "Бурденюк Дмитро, ІО-33",
   "editor": "wokwi",
   "parts": [
     {
@@ -9,11 +9,228 @@
       "top": 0,
       "left": 0,
       "attrs": {}
+    },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu",
+      "top": 40,
+      "left": 360,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "limit",
+      "top": 230,
+      "left": 380,
+      "attrs": {
+        "value": "512"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "base",
+      "top": 330,
+      "left": 360,
+      "attrs": {
+        "color": "blue",
+        "label": "BASE"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "button_pull",
+      "top": 305,
+      "left": 460,
+      "attrs": {
+        "value": "10000"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "scl_pull",
+      "top": -50,
+      "left": 310,
+      "attrs": {
+        "value": "4700"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "sda_pull",
+      "top": -80,
+      "left": 310,
+      "attrs": {
+        "value": "4700"
+      }
+    },
+    {
+      "type": "wokwi-logic-analyzer",
+      "id": "logic",
+      "top": 440,
+      "left": 340,
+      "attrs": {
+        "bufferSize": "5000000",
+        "channelNames": "SCL,SDA,UART_TX,BASE,ADC_MARK,LED,MPU_MARK"
+      }
     }
   ],
   "connections": [
-    ["$serialMonitor:TX", "nucleo:PA3", "", []],
-    ["$serialMonitor:RX", "nucleo:PA2", "", []]
+    [
+      "$serialMonitor:TX",
+      "nucleo:PA3",
+      "",
+      []
+    ],
+    [
+      "$serialMonitor:RX",
+      "nucleo:PA2",
+      "",
+      []
+    ],
+    [
+      "imu:VCC",
+      "nucleo:3V3.1",
+      "red",
+      []
+    ],
+    [
+      "imu:GND",
+      "nucleo:GND.1",
+      "black",
+      []
+    ],
+    [
+      "limit:VCC",
+      "nucleo:3V3.1",
+      "red",
+      []
+    ],
+    [
+      "limit:GND",
+      "nucleo:GND.1",
+      "black",
+      []
+    ],
+    [
+      "imu:SCL",
+      "nucleo:PB8",
+      "green",
+      []
+    ],
+    [
+      "imu:SDA",
+      "nucleo:PB9",
+      "green",
+      []
+    ],
+    [
+      "imu:AD0",
+      "nucleo:GND.1",
+      "green",
+      []
+    ],
+    [
+      "limit:SIG",
+      "nucleo:PA0",
+      "green",
+      []
+    ],
+    [
+      "base:1.l",
+      "nucleo:PB0",
+      "green",
+      []
+    ],
+    [
+      "base:2.l",
+      "nucleo:GND.1",
+      "green",
+      []
+    ],
+    [
+      "button_pull:1",
+      "nucleo:3V3.1",
+      "green",
+      []
+    ],
+    [
+      "button_pull:2",
+      "nucleo:PB0",
+      "green",
+      []
+    ],
+    [
+      "scl_pull:1",
+      "nucleo:3V3.1",
+      "green",
+      []
+    ],
+    [
+      "scl_pull:2",
+      "nucleo:PB8",
+      "green",
+      []
+    ],
+    [
+      "sda_pull:1",
+      "nucleo:3V3.1",
+      "green",
+      []
+    ],
+    [
+      "sda_pull:2",
+      "nucleo:PB9",
+      "green",
+      []
+    ],
+    [
+      "logic:GND",
+      "nucleo:GND.1",
+      "green",
+      []
+    ],
+    [
+      "logic:D0",
+      "nucleo:PB8",
+      "purple",
+      []
+    ],
+    [
+      "logic:D1",
+      "nucleo:PB9",
+      "purple",
+      []
+    ],
+    [
+      "logic:D2",
+      "nucleo:PA2",
+      "purple",
+      []
+    ],
+    [
+      "logic:D3",
+      "nucleo:PB0",
+      "purple",
+      []
+    ],
+    [
+      "logic:D4",
+      "nucleo:PA4",
+      "purple",
+      []
+    ],
+    [
+      "logic:D5",
+      "nucleo:PA5",
+      "purple",
+      []
+    ],
+    [
+      "logic:D6",
+      "nucleo:PA6",
+      "purple",
+      []
+    ]
   ],
   "dependencies": {}
 }

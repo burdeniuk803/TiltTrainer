@@ -1,36 +1,32 @@
 # TiltTrainer
 
-Тренажер утримання макета в межах допустимого нахилу відносно заданого положення. Бурденюк Дмитро, ІО-33.
+Тренажер відхилення від користувацького еталона. Бурденюк Дмитро Сергійович, ІО-33. Форма B, Nucleo-C031C6; середовище Ubuntu 24.04, Docker, STM32 HAL, Wokwi. Фізичної плати немає.
 
-Середовище: Ubuntu 24.04, Docker, STM32 HAL, Wokwi. Платформа Nucleo-C031C6, фізичної плати немає.
+ЛР 2 реалізує MPU6050/I²C, потенціометр/ADC, кнопку BASE/GPIO, числовий кут у UART і LED виходу за допуск. До калібрування кут невалідний. BASE збирає 50 нових стабільних samples; фільтр 5 векторів, допуск 5–45°, гістерезис 1°/100 мс. Motion та помилки приховують кут; після reinit потрібен новий еталон.
 
-## Що готово
-
-Збережено початкову прошивку, конфігурацію CubeMX та схему Wokwi без змін. Поточний HAL-шаблон налаштовує USART2 115200 8N1, LED PA5, I²C1 PB8/PB9 та PC13 EXTI. Код друкує `STM32C031C6 ready`, потім `tick <секунди>` і перемикає LED приблизно раз на секунду. I²C-пристроїв, ADC та калібрування ще немає; схема містить лише Nucleo і serial monitor.
-
-Підготовлено [PRD з 12 вимогами](docs/PRD.md), [опис компонентів і джерела](docs/hardware-components.md), [приймальні тести](docs/test-plan.md) та [план ЛР1/ЛР2](docs/lab-plan.md).
-
-Дві чисті Docker-збірки на Mac та одна на Ubuntu 24.04 успішні. На Mac SHA256 ELF/HEX/BIN збіглися між двома запусками. Між Mac та Ubuntu HEX/BIN однакові; повний ELF відрізняється лише рядком шляху libgcc у `.debug_str`. Завантажувані сегменти `PT_LOAD` однакові. [Логи, хеші та пояснення](docs/verification/README.md) містять фактичний час перевірки.
-
-Wokwi ще не запущено в межах цієї перевірки. UART/LED у симуляції потребують реального запуску й власного запису. PDF-звіт ще не підготовлено.
-
-## Збірка та запуск
-
-З кореня цієї копії проєкту, за запущеного Docker:
+## Відтворення
 
 ```sh
-docker --version
-make clean
 make build
-ls -lh firmware/build/firmware.elf firmware/build/firmware.hex firmware/build/firmware.bin
+make test
+make test-linux
+make coverage-linux
+make sanitize
 ```
 
-`make build` збирає образ із `docker/Dockerfile` і компілює firmware в контейнері з UID/GID поточного користувача. `make clean` очищає `firmware/build/`; ця папка не входить у Git. У Makefile є `image`, `build`, `clean`; запуск симуляції виконується командою розширення Wokwi.
+Відкрити цю папку у VS Code та виконати `Wokwi: Start Simulator` з уже доступною ліцензією. `wokwi.toml` завантажує firmware/build/firmware.hex та ELF. На старті очікуються BOOT, три SELFTEST та WAIT_BASE/valid0/NA. Натиснути зовнішню BASE, зачекати CAL_OK. Для повільного нахилу задати MPU accelX0.5, accelY0, accelZ0.85g та gyro0. Після стабілізації й підтвердження очікується 30.5°, OUTSIDE при допуску≈25°, LED HIGH. Потенціометр End дає 45° і WITHIN.
 
-Відкрити цю папку у VS Code, після збірки виконати `Wokwi: Start Simulator` з уже доступною ліцензією. `wokwi.toml` використовує `firmware/build/firmware.hex` та `firmware/build/firmware.elf`. Очікуємо стартове повідомлення, послідовні tick та блимання вбудованого LED. Перший tick може бути 0. Повний цикл світіння й погашення становить близько 2 с.
+UART приймає по одній ASCII-команді з Enter: `i` читає ID, `d` читає raw14bytes, `n` перевіряє відсутній 0x69, `f` спричиняє три заплановані NACK, `r` робить reset. Дочекатися відповіді перед наступною командою. Калібрування виконує фізичний GPIO BASE, не UART.
 
-## Наступний етап
+## Докази й межі
 
-У ЛР2 MPU6050 через I²C дасть оцінку нахилу за напрямом гравітації, кнопка GPIO збере еталон у спокої, а потенціометр ADC задасть допустимий кут. UART і LED показуватимуть вихід за межу. Частоти опитування, гістерезис та обробку помилок визначено в PRD як проектні критерії. Секундний цикл шаблону треба буде замінити для одночасної роботи компонентів.
+Вісім host groups PASS; GCC coverage переносимих модулів≥95.42%рядків/≥86.34%гілок. Власний 169 с Wokwi запис без помилок дав max MPU 20.034825 мс. Окремі записи підтверджують похилий еталон, ADC endpoints, motion, LED, NACK/recovery та reset. Пороги й точність host math не є виміряною точністю фізичного MPU. Board transport містить адаптацію моделі Wokwi; WOKWI=0 на платі не перевірено.
 
-Основа прошивки: [Wokwi STM32 HAL example](https://github.com/wokwi/stm32-hello-wokwi), адаптований у SP-Boilerplate. Ліцензію прикладу збережено в `LICENSE`, ліцензії ST/CMSIS у `firmware/Drivers`.
+- [Вимоги](docs/PRD.md), [сценарії T01–T13](docs/test-plan.md), [підключення і розрахунки](docs/pinout.md).
+- [Архітектура](docs/architecture.md), [тести та coverage](docs/testing.md), [залежності](docs/dependencies.md).
+- [Повні записи, PulseView і аналіз](docs/captures/README.md), [журнал проблем](docs/problem-journal.md), [план і стан](docs/lab-plan.md).
+- [Перевірки основи ЛР 1](docs/verification/README.md) збережені як історичні матеріали.
+
+Звіт PDF зберігається у SP/Lab02/Reports цього студента поза репозиторієм. Зміни ЛР2 передаються через PR feature/lab-2→main. Початковий main ЛР 1 не змінювався.
+
+Основа: Wokwi STM32 HAL example, адаптований у SP-Boilerplate. Ліцензії збережено в LICENSE та firmware/Drivers. Vendor ST sources не змінювалися.

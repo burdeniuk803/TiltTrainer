@@ -1,0 +1,51 @@
+[
+  {
+    "name": "bringup",
+    "source": "final-adapter-long-full.vcd",
+    "offset_ms": 100,
+    "end_ms": 132,
+    "sample_ns": 50
+  },
+  {
+    "name": "first-adc",
+    "source": "final-adapter-long-full.vcd",
+    "offset_ms": 103.42,
+    "end_ms": 103.57,
+    "sample_ns": 50
+  },
+  {
+    "name": "first-uart-byte",
+    "source": "final-adapter-long-full.vcd",
+    "offset_ms": 109.56,
+    "end_ms": 109.71,
+    "sample_ns": 50
+  },
+  {
+    "name": "first-burst",
+    "source": "final-adapter-long-full.vcd",
+    "offset_ms": 126.3,
+    "end_ms": 128.7,
+    "sample_ns": 50
+  },
+  {
+    "name": "baseline",
+    "source": "final-inclined-adc-reset-full.vcd",
+    "offset_ms": 600,
+    "end_ms": 2400,
+    "sample_ns": 1000
+  },
+  {
+    "name": "fault",
+    "source": "final-calibration-fault-full.vcd",
+    "offset_ms": 146200,
+    "end_ms": 147650,
+    "sample_ns": 1000
+  },
+  {
+    "name": "nack",
+    "source": "final-calibration-fault-full.vcd",
+    "offset_ms": 146363.4697,
+    "end_ms": 146363.6647,
+    "sample_ns": 50
+  }
+]

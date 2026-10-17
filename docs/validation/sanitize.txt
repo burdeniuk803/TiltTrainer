@@ -1,0 +1,13 @@
+/Library/Developer/CommandLineTools/usr/bin/make -C tests sanitize
+mkdir -p build/Darwin-arm64
+cc -DTT_TEST_ALL -I"/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Sensors" -I"/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer test_imu.c test_trainer.c test_recorded.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c -lm -o build/Darwin-arm64/test_sanitize
+./build/Darwin-arm64/test_sanitize
+PASS imu: register sequence, signed units, NACK/timeout/ID, output preservation
+PASS recorded Wokwi frames: units, temperature, 30.5 deg, tilted baseline, motion
+PASS T03: debounce, bounce, hold, rearm, tick wrap; periodic deadlines
+PASS T01/T04/T05: 50 fresh samples, inclined baseline, rejection retention, deadline, nested press, wrap
+PASS T06/T07: vector error_max=0.000012 deg, 4096 monotonic ADC codes and endpoints
+PASS T08/T09: exact boundaries, 100 ms, hysteresis, 40 ms excursion, overflow
+PASS T10/T11/T12: LED validity, failed reads, ADC fault, sensor recovery, 1 s stable, stale-filter removal
+PASS T13 host scheduler: duration=60000 ms MPU=3000 max=20 ms ADC=600 UART=300 max=200 ms presses=6
+PASS all TiltTrainer host groups

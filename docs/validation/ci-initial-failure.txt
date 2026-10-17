@@ -1,0 +1,14 @@
+firmware-and-host	Run make sanitize	﻿2026-10-13T16:20:58.9666251Z ##[group]Run make sanitize
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9666687Z [36;1mmake sanitize[0m
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9709311Z shell: /usr/bin/bash -e {0}
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9709718Z ##[endgroup]
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9781938Z make -C tests sanitize
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9791438Z make[1]: Entering directory '/home/runner/work/TiltTrainer/TiltTrainer/tests'
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9810377Z mkdir -p build/Linux-x86_64
+firmware-and-host	Run make sanitize	2026-10-13T16:20:58.9820464Z cc -DTT_TEST_ALL -I"/home/runner/work/TiltTrainer/TiltTrainer/firmware/Sensors" -I"/home/runner/work/TiltTrainer/TiltTrainer/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-omit-frame-pointer test_imu.c test_trainer.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c -lm -o build/Linux-x86_64/test_sanitize
+firmware-and-host	Run make sanitize	2026-10-13T16:20:59.3941130Z /usr/bin/ld: cannot open output file build/Linux-x86_64/test_sanitize: Permission denied
+firmware-and-host	Run make sanitize	2026-10-13T16:20:59.3942549Z collect2: error: ld returned 1 exit status
+firmware-and-host	Run make sanitize	2026-10-13T16:20:59.3954882Z make[1]: *** [Makefile:23: sanitize] Error 1
+firmware-and-host	Run make sanitize	2026-10-13T16:20:59.3955509Z make[1]: Leaving directory '/home/runner/work/TiltTrainer/TiltTrainer/tests'
+firmware-and-host	Run make sanitize	2026-10-13T16:20:59.3956686Z make: *** [Makefile:24: sanitize] Error 2
+firmware-and-host	Run make sanitize	2026-10-13T16:20:59.3973807Z ##[error]Process completed with exit code 2.

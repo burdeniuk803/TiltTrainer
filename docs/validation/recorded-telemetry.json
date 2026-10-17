@@ -1,0 +1,9 @@
+{
+  "source": "final-adapter-long-full.vcd",
+  "rows": 844,
+  "first_t_ms": 305,
+  "last_t_ms": 168905,
+  "min_interval_ms": 200,
+  "max_interval_ms": 200,
+  "analysis_date": "2026-10-15"
+}

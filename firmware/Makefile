@@ -36,11 +36,18 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+Board/runtime.c \
+Board/i2c_bus.c \
+Sensors/mpu6050.c \
+Trainer/timing.c \
+Trainer/trainer.c \
 Core/Src/main.c \
 Core/Src/stm32c0xx_it.c \
 Core/Src/stm32c0xx_hal_msp.c \
 Core/Src/syscalls.c \
 Core/Src/sysmem.c \
+Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_adc.c \
+Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_adc_ex.c \
 Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal.c \
 Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_cortex.c \
 Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc.c \
@@ -104,7 +111,9 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
+WOKWI ?= 1
 C_DEFS =  \
+-DTT_WOKWI=$(WOKWI) \
 -DUSE_HAL_DRIVER \
 -DSTM32C031xx
 
@@ -114,6 +123,7 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
+-IBoard -ISensors -ITrainer \
 -ICore/Inc \
 -IDrivers/STM32C0xx_HAL_Driver/Inc \
 -IDrivers/STM32C0xx_HAL_Driver/Inc/Legacy \
@@ -125,6 +135,9 @@ C_INCLUDES =  \
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+
+# Project sources receive stricter diagnostics than unmodified ST sources.
+$(filter-out $(addprefix $(BUILD_DIR)/,$(notdir $(filter Drivers/%,$(C_SOURCES:.c=.o)))),$(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))): CFLAGS += -Wextra -Werror
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2

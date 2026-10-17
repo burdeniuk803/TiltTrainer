@@ -1,0 +1,11 @@
+python3 tools/check_project.py
+PASS portable dependencies and TiltTrainer wiring/IOC
+/Library/Developer/CommandLineTools/usr/bin/make -C tests test
+mkdir -p build/Darwin-arm64
+cc -DTT_TEST_ALL -I"/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Sensors" -I"/Users/pliffdax/Projects/university/Study/People/Бурденюк Дмитро Сергійович/2026-Fall/SP/Lab01/Work/TiltTrainer/firmware/Trainer" -std=c11 -O0 -g -Wall -Wextra -Werror test_imu.c test_trainer.c ../firmware/Sensors/mpu6050.c ../firmware/Trainer/trainer.c ../firmware/Trainer/timing.c -lm -o build/Darwin-arm64/test_trainer
+./build/Darwin-arm64/test_trainer
+Assertion failed: (t.event==TT_CAL_REJECT && strcmp(t.reason,"SAMPLE_GAP")==0), function test_calibration, file test_trainer.c, line 72.
+PASS imu: register sequence, signed units, NACK/timeout/ID, output preservation
+PASS T03: debounce, bounce, hold, rearm, tick wrap; periodic deadlines
+make[1]: *** [test] Abort trap: 6
+make: *** [test] Error 2
